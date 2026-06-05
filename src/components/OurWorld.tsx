@@ -3,7 +3,7 @@ import {
   motion, useScroll, useTransform, useReducedMotion,
   type MotionValue,
 } from 'framer-motion'
-import { ArrowUpRight, ArrowRight, Plus } from 'lucide-react'
+import { ArrowUpRight, Plus } from 'lucide-react'
 
 const NAVY  = '#1A2B3C'
 const GREEN = '#3CB98C'
@@ -134,19 +134,16 @@ export function OurWorld() {
   const introY       = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -110])
   const introScale   = useTransform(scrollYProgress, [0, 1], [1, reduce ? 1 : 0.95])
 
+  // Fade entire sticky out at the end so shapes don't look messy before folder section
+  const stickyOpacity = useTransform(scrollYProgress, [0.80, 1], [1, 0])
+
   // Scroll cue
   const cueOpacity   = useTransform(scrollYProgress, [0, 0.07], [1, 0])
-
-  const goToBusinesses = (e: React.MouseEvent) => {
-    e.preventDefault()
-    document.getElementById('our-businesses')
-      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
 
   return (
     <section className="ow-root" aria-label="Eloma Group — one shared root">
       <div ref={ref} className="ow-stage">
-        <div className="ow-sticky">
+        <motion.div className="ow-sticky" style={{ opacity: stickyOpacity }}>
 
           {/* 3D floating shapes — present throughout, peak mid-scroll */}
           <div className="ow-shapes" aria-hidden>
@@ -172,43 +169,7 @@ export function OurWorld() {
             <span className="ow-cue-line" />
           </motion.div>
 
-        </div>
-      </div>
-
-      {/* Static folder — always visible below the hero, animates on hover only */}
-      <div className="ow-folder-section">
-        {/* Ambient 3D cards so the folder lives in the same world as the hero */}
-        <div className="ow-fsbg" aria-hidden>
-          <span className="ow-fs-shape ow-fs-1" />
-          <span className="ow-fs-shape ow-fs-2" />
-          <span className="ow-fs-shape ow-fs-3" />
-          <span className="ow-fs-shape ow-fs-4" />
-          <span className="ow-fs-shape ow-fs-5" />
-        </div>
-        <a
-          href="#our-businesses"
-          onClick={goToBusinesses}
-          className="ow-folder-wrap"
-          aria-label="Open our businesses"
-        >
-          <span className="ow-folder-eyebrow">Curious? Take a look inside</span>
-
-          <div className="ow-folder">
-            <div className="ow-folder-back" />
-            <div className="ow-folder-papers">
-              <span className="ow-paper ow-paper-1" />
-              <span className="ow-paper ow-paper-2" />
-              <span className="ow-paper ow-paper-3" />
-            </div>
-            <div className="ow-folder-front">
-              <span className="ow-folder-pill">5 Companies</span>
-              <span className="ow-folder-mark">eloma</span>
-              <span className="ow-folder-arrow"><ArrowRight size={24} color={NAVY} strokeWidth={2.4} /></span>
-            </div>
-          </div>
-
-          <span className="ow-folder-hint">Click to explore our businesses</span>
-        </a>
+        </motion.div>
       </div>
 
       <style>{`
@@ -284,170 +245,6 @@ export function OurWorld() {
           box-shadow: 0 0 0 4px ${GREEN}22;
         }
 
-        /* ── 3D folder — static section below the hero ───────── */
-        .ow-folder-section {
-          position: relative; z-index: 1; overflow: hidden;
-          min-height: 92vh;
-          display: flex; align-items: center; justify-content: center;
-          padding: clamp(56px, 9vw, 120px) clamp(24px, 4vw, 64px) clamp(80px, 11vw, 150px);
-        }
-
-        /* Ambient floating cards that frame the folder */
-        .ow-fsbg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-        .ow-fs-shape { position: absolute; display: block; will-change: transform; }
-        .ow-fs-1 {
-          width: clamp(220px, 26vw, 440px); aspect-ratio: 1; border-radius: 50%;
-          top: -9%; left: -7%; background: ${SILVER}; opacity: 0.75;
-          box-shadow: 0 40px 80px rgba(26,43,60,0.14), inset 0 3px 4px rgba(255,255,255,0.9);
-          animation: ow-fs-float-a 15s ease-in-out infinite;
-        }
-        .ow-fs-2 {
-          width: clamp(200px, 24vw, 400px); aspect-ratio: 1.7 / 1; border-radius: 999px;
-          bottom: -8%; right: -5%; background: ${SILVER}; opacity: 0.7;
-          box-shadow: 0 40px 80px rgba(26,43,60,0.14), inset 0 3px 4px rgba(255,255,255,0.9);
-          animation: ow-fs-float-b 17s ease-in-out infinite;
-        }
-        .ow-fs-3 {
-          width: clamp(64px, 7.5vw, 120px); aspect-ratio: 1; border-radius: 50%;
-          top: 16%; right: 11%; background: ${GREEN_G}; opacity: 0.92;
-          box-shadow: 0 22px 48px rgba(60,185,140,0.30);
-          animation: ow-fs-float-a 11s ease-in-out infinite;
-        }
-        .ow-fs-4 {
-          width: clamp(96px, 11vw, 168px); aspect-ratio: 2.3 / 1; border-radius: 999px;
-          bottom: 17%; left: 8%; background: ${NAVY_G}; opacity: 0.85;
-          box-shadow: 0 22px 48px rgba(26,43,60,0.30);
-          animation: ow-fs-float-b 13s ease-in-out infinite;
-        }
-        .ow-fs-5 {
-          width: clamp(120px, 14vw, 230px); aspect-ratio: 1; border-radius: 50%;
-          top: 32%; left: 5%; background: ${SILVER}; opacity: 0.5;
-          box-shadow: 0 34px 70px rgba(26,43,60,0.12);
-          animation: ow-fs-float-a 19s ease-in-out infinite;
-        }
-        @keyframes ow-fs-float-a {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50%      { transform: translateY(-24px) rotate(4deg); }
-        }
-        @keyframes ow-fs-float-b {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50%      { transform: translateY(20px) rotate(-3deg); }
-        }
-
-        .ow-folder-wrap {
-          position: relative; z-index: 1;
-          display: flex; flex-direction: column; align-items: center;
-          gap: clamp(20px, 2.4vw, 34px);
-          text-decoration: none; cursor: pointer;
-          perspective: 1400px;
-          will-change: transform, opacity;
-        }
-        .ow-folder-eyebrow {
-          font-size: clamp(14px, 1.2vw, 18px);
-          font-weight: 600; color: ${MUTED}; letter-spacing: 0.2px;
-        }
-
-        .ow-folder {
-          position: relative;
-          width: clamp(280px, 34vw, 460px);
-          height: clamp(224px, 27vw, 360px);
-          transform-style: preserve-3d;
-        }
-
-        /* back wall + tab notch */
-        .ow-folder-back {
-          position: absolute; inset: 0;
-          border-radius: 22px;
-          background: linear-gradient(155deg, #2A9B74 0%, #1C7D5C 100%);
-          transform: translateZ(0);
-          box-shadow: 0 44px 90px rgba(26,43,60,0.30);
-        }
-        .ow-folder-back::before {
-          content: ''; position: absolute;
-          top: -7%; left: 9%; width: 34%; height: 18%;
-          border-radius: 14px 14px 0 0;
-          background: linear-gradient(155deg, #2A9B74 0%, #20885F 100%);
-        }
-
-        /* papers peeking out the top */
-        .ow-folder-papers {
-          position: absolute; left: 5%; right: 5%; top: 4%; height: 84%;
-          transform: translateZ(14px);
-        }
-        .ow-paper {
-          position: absolute; left: 0; right: 0; top: 0; height: 100%;
-          background: #fff; border-radius: 12px;
-          box-shadow: 0 10px 26px rgba(26,43,60,0.16);
-          transform-origin: bottom center; overflow: hidden;
-          transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
-        }
-        .ow-paper::before {
-          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 26%;
-        }
-        .ow-paper::after {
-          content: ''; position: absolute; left: 9%; right: 30%; top: 34%; height: 6%;
-          background: rgba(26,43,60,0.10); border-radius: 4px;
-          box-shadow: 0 14px 0 rgba(26,43,60,0.07), 0 28px 0 rgba(26,43,60,0.05);
-        }
-        .ow-paper-1 { transform: translateY(0) rotate(0deg); }
-        .ow-paper-1::before { background: linear-gradient(90deg, #3CB98C, #2A9B74); }
-        .ow-paper-2 { transform: translateY(3px) rotate(0deg); }
-        .ow-paper-2::before { background: linear-gradient(90deg, #2F6E8F, #1A2B3C); }
-        .ow-paper-3 { transform: translateY(6px) rotate(0deg); }
-        .ow-paper-3::before { background: linear-gradient(90deg, #4FB39A, #1A2B3C); }
-
-        /* hover → folder breathes open, papers fan up */
-        .ow-folder-wrap:hover .ow-paper-1 { transform: translateY(-34px) rotate(-4deg); }
-        .ow-folder-wrap:hover .ow-paper-2 { transform: translateY(-22px) rotate(0deg); }
-        .ow-folder-wrap:hover .ow-paper-3 { transform: translateY(-34px) rotate(4deg); }
-
-        /* front flap */
-        .ow-folder-front {
-          position: absolute; left: 0; right: 0; bottom: 0; height: 82%;
-          border-radius: 20px; overflow: hidden;
-          background: linear-gradient(155deg, #50CDA2 0%, #3CB98C 52%, #2A9B74 100%);
-          transform: translateZ(34px); transform-origin: bottom center;
-          box-shadow: inset 0 2px 0 rgba(255,255,255,0.30),
-                      0 30px 54px rgba(42,155,116,0.34);
-          transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
-        }
-        .ow-folder-front::before {
-          content: ''; position: absolute; inset: 0;
-          background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,255,255,0.28) 0%, transparent 60%);
-          pointer-events: none;
-        }
-        .ow-folder-wrap:hover .ow-folder-front { transform: translateZ(34px) rotateX(-30deg); }
-
-        .ow-folder-pill {
-          position: absolute; top: clamp(14px, 1.8vw, 22px); left: clamp(14px, 1.8vw, 22px);
-          padding: 6px 14px; border-radius: 999px;
-          background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.30);
-          backdrop-filter: blur(6px);
-          color: #fff; font-size: clamp(11px, 0.9vw, 13px);
-          font-weight: 700; letter-spacing: 0.3px;
-        }
-        .ow-folder-mark {
-          position: absolute; left: 50%; top: 56%; transform: translate(-50%, -50%);
-          font-size: clamp(38px, 5.6vw, 80px); font-weight: 900; letter-spacing: -0.05em;
-          color: rgba(255,255,255,0.18); user-select: none;
-        }
-        .ow-folder-arrow {
-          position: absolute; right: clamp(16px, 1.8vw, 24px); bottom: clamp(16px, 1.8vw, 24px);
-          width: clamp(46px, 4vw, 58px); height: clamp(46px, 4vw, 58px);
-          border-radius: 50%; background: #fff;
-          display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 14px 28px rgba(26,43,60,0.24);
-          transform: scale(0.9); opacity: 0.9;
-          transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), opacity 0.5s ease;
-        }
-        .ow-folder-wrap:hover .ow-folder-arrow { transform: scale(1) translateX(2px); opacity: 1; }
-
-        .ow-folder-hint {
-          font-size: clamp(12px, 0.95vw, 14px);
-          font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-          color: ${GREEN};
-        }
-
         /* Scroll cue */
         .ow-cue {
           position: absolute;
@@ -471,13 +268,6 @@ export function OurWorld() {
         @media (max-width: 680px) {
           .ow-stage { height: 140vh; }
           .ow-cue   { display: none; }
-          .ow-folder { width: clamp(240px, 76vw, 380px); height: clamp(200px, 60vw, 300px); }
-          .ow-folder-eyebrow { font-size: 15px; }
-          /* touch devices: show the folder half-open so it reads as a folder */
-          .ow-paper-1 { transform: translateY(-22px) rotate(-4deg); }
-          .ow-paper-2 { transform: translateY(-12px) rotate(0deg); }
-          .ow-paper-3 { transform: translateY(-22px) rotate(4deg); }
-          .ow-folder-arrow { opacity: 1; transform: scale(1); }
         }
         @media (prefers-reduced-motion: reduce) {
           .ow-cue-line { animation: none; }

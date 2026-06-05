@@ -22,9 +22,13 @@ export function Hero3Section() {
   const wrapperOpacity    = useTransform(scrollYProgress, [0.78, 0.92], [1, 0])
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    const video  = videoRef.current
-    if (!canvas || !video) return
+    const canvasRaw = canvasRef.current
+    const videoRaw  = videoRef.current
+    if (!canvasRaw || !videoRaw) return
+
+    // Re-bind to non-nullable locals so closures below see the narrowed type
+    const canvas: HTMLCanvasElement = canvasRaw
+    const video: HTMLVideoElement   = videoRaw
 
     const ctx     = canvas.getContext('2d')!
     let rafId     = 0
